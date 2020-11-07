@@ -55,6 +55,7 @@ class UnixLikeOsArguments implements NativeImageArguments {
     private final ListProperty<String> additionalArguments;
     @NotNull
     private final ConfigurationFiles configurationFiles;
+    private boolean useJar;
 
     UnixLikeOsArguments(
             @NotNull Property<Configuration> runtimeClasspath,
@@ -71,6 +72,7 @@ class UnixLikeOsArguments implements NativeImageArguments {
         this.executableName = executableName;
         this.additionalArguments = additionalArguments;
         this.configurationFiles = configurationFiles;
+        this.useJar = true;
     }
 
     @NotNull
@@ -154,10 +156,14 @@ class UnixLikeOsArguments implements NativeImageArguments {
     }
 
     @InputFiles
-    public @NotNull ConfigurableFileCollection getJarFiles() {
+    public @NotNull Iterable<File> getJarFiles() {
         LoggerFactory.getLogger(NativeImageArguments.class)
                 .info("jar-file: {}/build: {}", jarFile, jarFile.getBuiltBy());
-        return jarFile;
+        if (this.useJar) {
+            return jarFile;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     @Override
@@ -172,8 +178,13 @@ class UnixLikeOsArguments implements NativeImageArguments {
 
     @Override
     public void addJarFile(@NotNull Jar jar) {
-        jarFile.builtBy(jar);
-        jarFile.from(jar);
+        //FIXME I'm using null!!!
+        if (jar == null) {
+            this.useJar = false;
+        } else {
+            jarFile.builtBy(jar);
+            jarFile.from(jar);
+        }
     }
 
     @Override
