@@ -125,7 +125,7 @@ generateNativeImageConfig {
   }
   byRunningApplicationWithoutArguments()
   byRunningApplication {
-    arguments('-h')
+    arguments("-h")
   }
 }
 ```
